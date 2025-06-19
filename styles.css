@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+#game-area {
+    margin: 20px;
+}
+
+#tap-button {
+    padding: 10px 20px;
+    font-size: 20px;
+}
+
+#score-display {
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+#leaderboard {
+    margin: 20px;
+}
+
+#subscription, #link-wallet {
+    margin: 20px;
+}

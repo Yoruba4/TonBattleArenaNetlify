@@ -1,8 +1,8 @@
 const { createClient } = supabase;
 
 // Initialize Supabase client
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseUrl = 'https://hfoeczjdvjdrzjvgkuoq.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhmb2VjempkdmpkcnpqdmdrdW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzMjM1MzMsImV4cCI6MjA2NTg5OTUzM30.VcFFhbOZGiwlHdf-4KgrTbRpuitl4GLOmApI5UNoHwA';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let score = 0;

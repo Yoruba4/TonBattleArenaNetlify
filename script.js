@@ -1,43 +1,85 @@
-const { createClient } = supabase;
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// Initialize Supabase client
+// Your Supabase credentials
 const supabaseUrl = 'https://hfoeczjdvjdrzjvgkuoq.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhmb2VjempkdmpkcnpqdmdrdW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzMjM1MzMsImV4cCI6MjA2NTg5OTUzM30.VcFFhbOZGiwlHdf-4KgrTbRpuitl4GLOmApI5UNoHwA'; // Your actual ANON public key
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhmb2VjempkdmpkcnpqdmdrdW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzMjM1MzMsImV4cCI6MjA2NTg5OTUzM30.VcFFhbOZGiwlHdf-4KgrTbRpuitl4GLOmApI5UNoHwA';
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Temporary auth
+let currentUser = null;
+
+async function signInAnonymously() {
+  const { data, error } = await supabase.auth.signUp({ email: `${Date.now()}@example.com`, password: crypto.randomUUID() });
+  if (data.user) {
+    currentUser = data.user;
+    console.log("Signed in as:", currentUser.id);
+    await supabase.from('users').insert({ auth_user_id: currentUser.id });
+  } else if (error) {
+    console.error("Sign in failed:", error.message);
+  }
+}
+
+await signInAnonymously();
+
+// Score logic
 let score = 0;
-const userId = 'test-user-id'; // Use a placeholder for testing
 
-// Function to update score
-async function updateScore(userId, score, isBonus) {
-    const { data, error } = await supabase.rpc('update_score', { user_id: userId, score: score, is_bonus: isBonus });
-    if (error) console.error('Error updating score:', error);
+async function updateScore(score, isBonus = false) {
+  if (!currentUser) return;
+  const { data, error } = await supabase.from("scores").insert({
+    user_id: (await getUserId()),
+    score,
+    is_bonus: isBonus
+  });
+  if (error) console.error("Score error:", error);
 }
 
-// Function to subscribe
-async function subscribe(userId) {
-    const { data, error } = await supabase.rpc('subscribe', { user_id: userId });
-    if (error) console.error('Error subscribing:', error);
+// Link wallet
+async function linkWallet(wallet) {
+  if (!currentUser) return;
+  const userId = await getUserId();
+  const { error } = await supabase
+    .from("users")
+    .update({ ton_wallet_address: wallet })
+    .eq("id", userId);
+  if (error) console.error("Wallet error:", error);
+  else alert("Wallet linked!");
 }
 
-// Function to link wallet address
-async function linkWallet(userId, walletAddress) {
-    const { data, error } = await supabase.rpc('link_wallet', { user_id: userId, wallet_address: walletAddress });
-    if (error) console.error('Error linking wallet:', error);
+// Subscribe
+async function subscribe() {
+  const userId = await getUserId();
+  const { data, error } = await supabase.from("subscriptions").insert({
+    user_id: userId,
+    subscription_date: new Date()
+  });
+  if (error) console.error("Subscription error:", error);
+  else alert("Subscribed!");
 }
 
-// Event listeners
-document.getElementById('tap-button').addEventListener('click', () => {
-    score += 1; // Increment score
-    document.getElementById('score-display').innerText = `Score: ${score}`;
-    updateScore(userId, score, false); // Assuming isBonus is false
+// Get internal user ID
+async function getUserId() {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id")
+    .eq("auth_user_id", currentUser.id)
+    .single();
+  return data?.id;
+}
+
+// UI interactions
+document.getElementById("tap-button").addEventListener("click", async () => {
+  score += 1;
+  document.getElementById("score-display").innerText = `Score: ${score}`;
+  await updateScore(score, false);
 });
 
-document.getElementById('subscribe-button').addEventListener('click', () => {
-    subscribe(userId);
+document.getElementById("link-wallet-button").addEventListener("click", async () => {
+  const wallet = document.getElementById("wallet-address").value;
+  await linkWallet(wallet);
 });
 
-document.getElementById('link-wallet-button').addEventListener('click', () => {
-    const walletAddress = document.getElementById('wallet-address').value;
-    linkWallet(userId, walletAddress);
+document.getElementById("subscribe-button").addEventListener("click", async () => {
+  await subscribe();
 });

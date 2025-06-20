@@ -1,39 +1,40 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
 }
 
 #game-area {
-    margin: 20px;
+  margin: 20px;
 }
 
 #tap-button {
-    padding: 10px 20px;
-    font-size: 20px;
+  padding: 10px 20px;
+  font-size: 20px;
 }
 
 #tap-button:hover {
-    background-color: #d0d0d0; /* Change background on hover */
-    cursor: pointer; /* Change cursor to pointer */
+  background-color: #d0d0d0;
+  cursor: pointer;
 }
 
 #score-display {
-    font-size: 24px;
-    margin-top: 10px;
+  font-size: 24px;
+  margin-top: 10px;
 }
 
 #leaderboard {
-    margin: 20px;
+  margin: 20px;
 }
 
-#subscription, #link-wallet {
-    margin: 20px;
+#subscription,
+#link-wallet {
+  margin: 20px;
 }
 
 @media (max-width: 600px) {
-    #tap-button {
-        width: 100%; /* Make button full width on small screens */
-        font-size: 18px; /* Adjust font size */
-    }
+  #tap-button {
+    width: 100%;
+    font-size: 18px;
+  }
 }
